@@ -1,0 +1,5 @@
+#include("Deck.jl")
+#include("shuffled_Deck.jl")
+#include("Deck afbeelden.jl")
+#include("delen.jl")
+#include("compare_hands.jl")
