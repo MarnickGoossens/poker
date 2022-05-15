@@ -3,8 +3,8 @@ from random import shuffle, choice, choices
 
 # spelers aanmaken
 def spelers_maken():
-    # aantal_spelers = int(input(f"hoeveel spelers\n"))
-    aantal_spelers = 4
+    aantal_spelers = int(input(f"hoeveel spelers\n"))
+    # aantal_spelers = 2
     for x in range(1, aantal_spelers + 1):
         globals()[f"speler{x}"] = [True, 0, False, 1000]
     globals()[f"tafel"] = []
@@ -133,16 +133,54 @@ def pot():
     return bedrag
 
 
-def check_paar():
+def check_hand():
+    hands = []
+
+    # zoek paren
     for i in range(1, aantal_spelers + 1):
         for kaart_tafel in tafel:
             for kaart_speler in globals()[f"speler{i}"][1:3]:
                 if kaart_speler[0] in kaart_tafel:
-                    print(f"speler{i} heeft een paar")
+                    tupl = (f"speler{i}", "paar", kaart_speler[0])
+                    hands.append(tupl)
+
+    # zoek twee paren
+    speler1_paren = 0
+    speler2_paren = 0
+    for i in hands:
+        if "speler1" in i:
+            speler1_paren += 1
+        if "speler2" in i:
+            speler2_paren += 1
+    if speler1_paren == 2:
+        getal1 = hands[0][2]
+        getal2 = hands[1][2]
+        hands.remove(hands[0])
+        hands.remove(hands[0])
+        tupl = ("speler1", "two pair", getal1, getal2)
+        hands.insert(0, tupl)
+    if speler2_paren == 2:
+        if speler1_paren <= 2:
+            getal1 = hands[1][2]
+            getal2 = hands[2][2]
+            hands.remove(hands[1])
+            hands.remove(hands[1])
+            tupl = ("speler2", "two pair", getal1, getal2)
+            hands.insert(0, tupl)
+    return hands
 
 
 def winner():
-    check_paar()
+    hands = check_hand()
+    hoogste_hand = hands[0][1]
+    speler = "speler1"
+    for hand in hands:
+        if hand[1] == "two pair" and hoogste_hand == "pair":
+            hoogste_hand = hand[1]
+            speler = hand[0]
+
+    print(hands)
+    print(f"{speler} heeft gewonnen")
 
 
 """
@@ -169,10 +207,11 @@ check_inzet()
 print(tafel)
 check_inzet()
 print(tafel)
-print(speler1)
-print(speler2)
-print(speler3)
-print(speler4)
-winner()
-# bedrag_pot = pot()
-# print(f"Winnende pot:    {bedrag_pot}")
+for i in range(1, aantal_spelers + 1):
+    print(
+        f"speler{i}:    {globals()[f'speler{i}'][1]}, {globals()[f'speler{i}'][2]}, {globals()[f'speler{i}'][5]}"
+    )
+
+# winner()
+bedrag_pot = pot()
+print(f"Winnende pot:    {bedrag_pot}")
