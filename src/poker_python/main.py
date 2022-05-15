@@ -133,69 +133,6 @@ def pot():
     return bedrag
 
 
-def check_hand():
-    hands = []
-
-    # zoek paren
-    for i in range(1, aantal_spelers + 1):
-        for kaart_tafel in tafel:
-            for kaart_speler in globals()[f"speler{i}"][1:3]:
-                if kaart_speler[0] in kaart_tafel:
-                    tupl = (f"speler{i}", "paar", kaart_speler[0])
-                    hands.append(tupl)
-
-    # zoek twee paren
-    speler1_paren = 0
-    speler2_paren = 0
-    for i in hands:
-        if "speler1" in i:
-            speler1_paren += 1
-        if "speler2" in i:
-            speler2_paren += 1
-    if speler1_paren == 2:
-        getal1 = hands[0][2]
-        getal2 = hands[1][2]
-        hands.remove(hands[0])
-        hands.remove(hands[0])
-        tupl = ("speler1", "two pair", getal1, getal2)
-        hands.insert(0, tupl)
-    if speler2_paren == 2:
-        if speler1_paren <= 2:
-            getal1 = hands[1][2]
-            getal2 = hands[2][2]
-            hands.remove(hands[1])
-            hands.remove(hands[1])
-            tupl = ("speler2", "two pair", getal1, getal2)
-            hands.insert(0, tupl)
-    return hands
-
-
-def winner():
-    hands = check_hand()
-    hoogste_hand = hands[0][1]
-    speler = "speler1"
-    for hand in hands:
-        if hand[1] == "two pair" and hoogste_hand == "pair":
-            hoogste_hand = hand[1]
-            speler = hand[0]
-
-    print(hands)
-    print(f"{speler} heeft gewonnen")
-
-
-"""
-10) high card:           hoogste value
-9) pair:                 2 gelijke value
-8) two pair:             2x pair
-7) three of a kind:      3 gelijke value
-6) straight:             5 opeenvolgende value
-5) flush:                5 gelijke suits
-4) full house:           three of a kind + pair
-3) four of a kind:       4 gelijke value
-2) straight flush:       straight + flush
-1) royal flush:          flush + 10-A
-"""
-
 aantal_spelers = spelers_maken()
 kaart_spel = kaart_spel_maken()
 deel_kaarten(aantal_spelers)
@@ -211,7 +148,5 @@ for i in range(1, aantal_spelers + 1):
     print(
         f"speler{i}:    {globals()[f'speler{i}'][1]}, {globals()[f'speler{i}'][2]}, {globals()[f'speler{i}'][5]}"
     )
-
-# winner()
 bedrag_pot = pot()
 print(f"Winnende pot:    {bedrag_pot}")
