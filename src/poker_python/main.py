@@ -6,7 +6,7 @@ def spelers_maken():
     # aantal_spelers = int(input(f"hoeveel spelers\n"))
     aantal_spelers = 4
     for x in range(1, aantal_spelers + 1):
-        globals()[f"speler{x}"] = [True, 0]
+        globals()[f"speler{x}"] = [True, 0, False, 1000]
     globals()[f"tafel"] = []
     return aantal_spelers
 
@@ -46,25 +46,59 @@ def deel_kaarten(aantal_spelers):
     tafel.append(choice(kaart_spel))
 
 
+def raise_false():
+    for i in range(1, aantal_spelers + 1):
+        globals()[f"speler{i}"][4] = False
+
+
 # inzet functie
 def inzet():
+    bedrag = 0
     for i in range(1, aantal_spelers + 1):
         hoogste_bedrag = 0
         for j in range(1, aantal_spelers + 1):
             if globals()[f"speler{j}"][3] > hoogste_bedrag:
                 hoogste_bedrag = globals()[f"speler{j}"][3]
         if globals()[f"speler{i}"][0] == True:
+            if globals()[f"speler{i}"][4] == False:
+                print()
+                print(
+                    globals()[f"speler{i}"][1],
+                    globals()[f"speler{i}"][2],
+                    f", {globals()[f'speler{i}'][5]}",
+                )
+
+                keuze = input(f"Speler{i}: fold/call/raise:    ")
+
+                if keuze == "fold":
+                    globals()[f"speler{i}"][0] = False
+
+                if keuze == "call":
+                    if bedrag > globals()[f"speler{i}"][5]:
+                        print("U hebt teweinig geld, u moet folden")
+                        fold = input("")
+                        if "fold" in fold:
+                            globals()[f"speler{i}"][0] = False
+                    else:
+                        globals()[f"speler{i}"][3] = hoogste_bedrag
+                        globals()[f"speler{i}"][5] -= bedrag
+
+                if keuze == "raise":
+                    bedrag = int(input(f"hoeveel wilt u raise:    "))
+                    while bedrag > globals()[f"speler{i}"][5]:
+                        print(f"U kan maximaal {globals()[f'speler{i}'][5]} inzetten")
+                        bedrag = int(input(f"hoeveel wilt u raise:    "))
+                    if bedrag <= globals()[f"speler{i}"][5]:
+                        raise_false()
+                        globals()[f"speler{i}"][3] += bedrag
+                        globals()[f"speler{i}"][5] -= bedrag
+                        globals()[f"speler{i}"][4] = True
+
+            else:
+                globals()[f"speler{i}"][4] = False
+                break
             print()
-            print(globals()[f"speler{i}"][1], globals()[f"speler{i}"][2])
-            keuze = input(f"Speler{i}: fold/call/raise:    ")
-            if keuze == "fold":
-                globals()[f"speler{i}"][0] = False
-            if keuze == "call":
-                globals()[f"speler{i}"][3] = hoogste_bedrag
-            if keuze == "raise":
-                bedrag = int(input(f"hoeveel wilt u raise:    "))
-                globals()[f"speler{i}"][3] = bedrag
-            print()
+
     lijst = []
     for i in range(1, aantal_spelers + 1):
         if globals()[f"speler{i}"][0] == True:
@@ -82,7 +116,47 @@ def check_inzet():
         result = all(element == lijst[0] for element in lijst)
         if result == False:
             continue
+    calls = []
+    for i in range(1, aantal_spelers + 1):
+        calls.append(globals()[f"speler{i}"][5])
+    calls_minimum = min(calls)
+    for i in range(1, aantal_spelers + 1):
+        globals()[f"speler{i}"][5] = calls_minimum
 
+    raise_false()
+
+
+def pot():
+    bedrag = 0
+    for i in range(1, aantal_spelers + 1):
+        bedrag += globals()[f"speler{i}"][3]
+    return bedrag
+
+
+def check_paar():
+    for i in range(1, aantal_spelers + 1):
+        for kaart_tafel in tafel:
+            for kaart_speler in globals()[f"speler{i}"][1:3]:
+                if kaart_speler[0] in kaart_tafel:
+                    print(f"speler{i} heeft een paar")
+
+
+def winner():
+    check_paar()
+
+
+"""
+10) high card:           hoogste value
+9) pair:                 2 gelijke value
+8) two pair:             2x pair
+7) three of a kind:      3 gelijke value
+6) straight:             5 opeenvolgende value
+5) flush:                5 gelijke suits
+4) full house:           three of a kind + pair
+3) four of a kind:       4 gelijke value
+2) straight flush:       straight + flush
+1) royal flush:          flush + 10-A
+"""
 
 aantal_spelers = spelers_maken()
 kaart_spel = kaart_spel_maken()
@@ -95,3 +169,10 @@ check_inzet()
 print(tafel)
 check_inzet()
 print(tafel)
+print(speler1)
+print(speler2)
+print(speler3)
+print(speler4)
+winner()
+# bedrag_pot = pot()
+# print(f"Winnende pot:    {bedrag_pot}")
