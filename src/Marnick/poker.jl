@@ -166,7 +166,9 @@ function check_inzet(spelers)
     calls_minimum = minimum(calls)
     for i in 1:length(spelers)
         speler = "speler" * string(i)
-        spelers[speler][6] = calls_minimum
+        if (spelers[speler][1] == true)
+            spelers[speler][6] = calls_minimum
+        end
     end
     raise_false(spelers)
     return spelers
